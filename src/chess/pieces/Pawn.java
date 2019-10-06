@@ -2,13 +2,17 @@ package chess.pieces;
 
 import boardgame.Board;
 import boardgame.Position;
+import chess.ChessMatch;
 import chess.ChessPiece;
 import chess.Color;
 
 public class Pawn extends ChessPiece {
 
-	public Pawn(Board board, Color color) {
+	private ChessMatch chessMath;
+	
+	public Pawn(Board board, Color color, ChessMatch chessMath) {
 		super(board, color);
+		this.chessMath = chessMath;
 	}
 	
 	@Override
@@ -44,6 +48,29 @@ public class Pawn extends ChessPiece {
 			}
 		}
 			
+		// #specialmove En Passant
+		int iPos, iMov;
+		
+		if (getColor() == Color.WHITE) {
+			iPos = 7-position.getRow();
+			iMov = -1;
+		}
+		else {
+			iPos = position.getRow();
+			iMov = 1;
+		}
+		
+		if (iPos == 4) {
+			for (int c=-1; c<=1; c++) {
+				if (c!=0) {
+					Position oPiece = new Position(position.getRow(), position.getColumn() + c);
+					if (getBoard().positionExists(oPiece) && IsThereOpponentPiece(oPiece) && getBoard().piece(oPiece) == chessMath.getEnPassantVulnerable()) {
+						mat[oPiece.getRow() + iMov][oPiece.getColumn()] = true;
+					}
+				}
+			}
+		}
+		
 		return mat;
 	}
 	
